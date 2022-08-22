@@ -51,5 +51,9 @@ To clone the git repository:
 <a name="webapp"></a>
 ## Webapp
 You can type the message from the message csv coloumn into the input session where you will see the classification results.
-![image info](./screenshots/photo.png)
+<img src="./screenshots/photo.png" width="800" height="600" />
+
+Also you can see the overall statistic of the database
+
+<img src="./screenshots/stata.png" width="800" height="600" />
  

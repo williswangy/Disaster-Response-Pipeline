@@ -46,8 +46,10 @@ def clean_data(df):
     df.drop(["categories"],axis = 1,inplace=True)
     # concatenate the original dataframe with the new `categories` dataframe
     df = pd.concat([df,categories], axis = 1, join = 'inner' )
-
+    # Remove the value 2 for related field since it is mean
     df.drop_duplicates(inplace=True)
+
+    df = df[df['related'] != 2]
     return df
 
 
@@ -60,7 +62,7 @@ def save_data(df, database_filename):
        database_filename (str): The file name of the database
     """
     engine = create_engine('sqlite:///{}'.format(database_filename))
-    df.to_sql('disaster_response', engine, index=False)
+    df.to_sql('disaster_response', engine, index=False,if_exists='replace')
 
 
 def main():
