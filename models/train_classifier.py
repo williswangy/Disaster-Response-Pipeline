@@ -9,7 +9,7 @@ from nltk.corpus import stopwords
 import re
 from sklearn.pipeline import Pipeline
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import AdaBoostClassifier
 from sklearn.multioutput import MultiOutputClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report
@@ -22,8 +22,7 @@ def load_data(database_filepath):
     df = pd.read_sql_table('disaster_response',engine)
     X = df["message"] # message column fro training
     Y = df.iloc[:, 4:] # 36 categories for target
-    category_names = Y.columns
-    return X, Y, category_names
+    return X, Y
 
 
 def tokenize(text):
@@ -38,29 +37,35 @@ def tokenize(text):
     return clean_tokens
 
 
-
+# Used AdaBoostClassifier
 def build_model():
     pipeline = Pipeline([
-        ('vect', CountVectorizer()),
+        ('vect', CountVectorizer(tokenizer=tokenize)),
         ('tfidf', TfidfTransformer()),
-        ('clf', MultiOutputClassifier(RandomForestClassifier()))])
-    
+        ('clf', MultiOutputClassifier(AdaBoostClassifier()))
+    ])
+    # Create Grid search parameters
     parameters = {
-        #'tfidf__use_idf': (True, False),
-        'clf__estimator__n_estimators': [50, 100]
-        #'clf__estimator__min_samples_split': [2, 4]
-        } 
-    cv = GridSearchCV(pipeline, param_grid=parameters)    
+        'tfidf__use_idf': (True, False),
+        'clf__estimator__n_estimators': [30,40]
+    }
+
+    cv = GridSearchCV(pipeline, param_grid=parameters)
+
     return cv
 
     
 
 
-def evaluate_model(model, X_test, Y_test, category_names):
+def evaluate_model(model, X_test, Y_test):
     y_pred = model.predict(X_test)
-    print(classification_report(y_pred, Y_test.values, target_names=category_names))
-    # print raw accuracy score 
-    print('Accuracy Score: {}'.format(np.mean(Y_test.values == y_pred)))
+    i = 0
+    for col in Y_test:
+        print('Feature {}: {}'.format(i + 1, col))
+        print(classification_report(Y_test[col], y_pred[:, i]))
+        i = i + 1
+    score = (y_pred == Y_test.values).mean()
+    print('The model score is {:.3f}'.format(score))
 
 
 def save_model(model, model_filepath):
@@ -82,7 +87,7 @@ def main():
         model.fit(X_train, Y_train)
         
         print('Evaluating model...')
-        evaluate_model(model, X_test, Y_test, category_names)
+        evaluate_model(model, X_test, Y_test)
 
         print('Saving model...\n    MODEL: {}'.format(model_filepath))
         save_model(model, model_filepath)

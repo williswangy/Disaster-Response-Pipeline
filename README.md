@@ -3,6 +3,7 @@
 1. [Description](#description)
 2. [Library](#Library)
 3. [Running](#running)
+4. [WebApp](#webapp)
 
 
 <a name="descripton"></a>
@@ -37,7 +38,7 @@ To clone the git repository:
 
  To run the ML pipeline that loads data from DB, trains classifier and saves the classifier as a pickle file
 ```
-    python models/train_classifier.py data/disaster_response_db.db models/classifier.pkl
+    python models/train_classifier.py data/DisasterResponse.db models/classifier.pkl
 ```
  Run the following command in the app's directory to run your web app.
     `python run.py`
@@ -47,3 +48,8 @@ To clone the git repository:
     http://0.0.0.0:3000/
  ```
 
+<a name="webapp"></a>
+## Webapp
+You can type the message from the message csv coloumn into the input session where you will see the classification results.
+![image info](./screenshots/photo.png)
+ 
